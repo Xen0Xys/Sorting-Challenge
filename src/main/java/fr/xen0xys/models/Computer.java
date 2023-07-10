@@ -16,7 +16,7 @@ public class Computer {
             case INSERTION_SORT -> algorithm = new InsertionSort(this, rods);
             default -> throw new IllegalStateException("Unexpected value: " + algorithmType);
         }
-        this.runner = new Runner(algorithm::step, 10000, false);
+        this.runner = new Runner(algorithm::step, 20, true);
     }
 
     public void start(){

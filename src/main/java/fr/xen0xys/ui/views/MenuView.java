@@ -19,7 +19,7 @@ public class MenuView extends JPanel {
     private void initComponents() {
         this.startButton.setBounds(50, 250, 400, 50);
         this.startButton.addActionListener(e -> {
-            this.frame.loadView(new AlgorithmView(this.frame, 64));
+            this.frame.loadView(new AlgorithmView(this.frame, 25));
         });
         this.add(this.startButton);
     }

@@ -38,37 +38,34 @@ public class Runner extends Thread{
         this.action = action;
         this.aps = 1D/aps;
         this.stability = stability;
-        this.apsQueue = EvictingQueue.create(1000);
+        this.apsQueue = EvictingQueue.create(aps);
     }
 
-    @SuppressWarnings("BusyWait")
     @Override
     public void run() {
         this.running = true;
-        long nextAction = (long) (System.currentTimeMillis() + this.aps * 1000L);
-        long start = System.currentTimeMillis();
+        long nextAction = (long) (System.nanoTime() + this.aps * 1_000_000_000L);
+        long start = System.nanoTime();
         while (running){
             if(!paused){
-                if(System.currentTimeMillis() >= nextAction){
-
+                if(System.nanoTime() >= nextAction){
                     this.action.run();
                     this.passedActions++;
                     if(this.stability)
-                        nextAction = (long) (nextAction + this.aps * 1000L);
+                        nextAction = (long) (nextAction + this.aps * 1_000_000_000L);
                     else
-                        nextAction = (long) (System.currentTimeMillis() + this.aps * 1000L);
-                    long end = System.currentTimeMillis();
+                        nextAction = (long) (System.nanoTime() + this.aps * 1_000_000_000L);
+                    long end = System.nanoTime();
                     this.queueLock.lock();
-                    this.apsQueue.add(end - start);
-                    this.queueLock.unlock();
-                    start = System.currentTimeMillis();
+                    try {
+                        this.apsQueue.add(end - start);
+                    } finally {
+                        this.queueLock.unlock();
+                    }
+                    start = System.nanoTime();
                 }
             }
-            try {
-                Thread.sleep(0, 100);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            Thread.yield();
         }
         this.apsQueue.clear();
     }
@@ -87,19 +84,22 @@ public class Runner extends Thread{
         return passedActions;
     }
     public int getCurrentAps() {
-        return (int) (1D / (computeAverage() / 1000D));
+        return (int) (1D / (computeAverage() / 1_000_000_000D));
     }
 
     private double computeAverage() {
         long sum = 0;
         int count = this.apsQueue.size();
         this.queueLock.lock();
-        for (long element : this.apsQueue)
-            sum += element;
-        this.queueLock.unlock();
+        try{
+            for (long element : this.apsQueue)
+                sum += element;
+        }finally {
+            this.queueLock.unlock();
+        }
         if (count > 0)
             return (double) sum / count;
         else
-            return -1000;
+            return -1_000_000_000;
     }
 }

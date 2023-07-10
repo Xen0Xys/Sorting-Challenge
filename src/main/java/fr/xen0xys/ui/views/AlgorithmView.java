@@ -22,14 +22,21 @@ public class AlgorithmView extends JPanel {
     private final Runner graphicRunner;
     private final Computer computer;
 
+    private final Font font = new Font("Roboto", Font.PLAIN, 18);
+    private final Rectangle2D rectangle2D = new Rectangle2D.Double(0, 0, 0, 0);
+    private final double spaceWidth = 1;
+    private final double spaces;
+
     public AlgorithmView(GameWindow window, int rodCount) {
         this.window = window;
-        this.graphicRunner = new Runner(this::repaint, 1000, false);
+        this.graphicRunner = new Runner(this::repaint, 300, true);
         this.initPanel();
         // Init rods
         this.rods = new ArrayList<>();
         this.initRods(rodCount);
-        this.computer = new Computer(AlgorithmType.INSERTION_SORT, this.rods);
+        this.computer = new Computer(AlgorithmType.SELECTION_SORT, this.rods);
+        // Init graphic values
+        this.spaces = this.rods.size() * spaceWidth;
         // Start runners
         this.graphicRunner.start();
         this.computer.start();
@@ -53,32 +60,28 @@ public class AlgorithmView extends JPanel {
     @Override
     protected void paintComponent(@NotNull final Graphics g) {
         super.paintComponent(g);
-        final Graphics2D g2d = (Graphics2D) g;
+        Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
                 RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        g2d.setColor(Color.BLACK);
-        g2d.clearRect(0, 0, this.getWidth(), this.getHeight());
-        g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
         g2d.setColor(Color.WHITE);
-        g2d.setFont(new Font("Roboto", Font.PLAIN, 18));
+        g2d.setFont(font);
         g2d.drawString("FPS : %d    TPS : %d".formatted(this.graphicRunner.getCurrentAps(), this.computer.getRunner().getCurrentAps()), 15, 25);
         this.drawRods(g2d);
     }
 
     private void drawRods(Graphics2D g) {
-        double spaceWidth = 2;
-        double spaces = this.rods.size() * spaceWidth;
-        double rodWidth = (this.getWidth() - spaces) / this.rods.size();
+        double rodWidth = (this.getWidth() - this.spaces) / this.rods.size();
         double maxRodHeight = this.getHeight() - 50;
         for(int i = 0; i < this.rods.size(); i++){
             Rod rod = this.rods.get(i);
-            double x = i * spaceWidth + i * rodWidth;
+            double x = i * this.spaceWidth + i * rodWidth;
             double height = maxRodHeight * rod.getValue() / this.rods.size();
             double y = this.getHeight() - height;
             g.setColor(rod.getColor());
-            g.fill(new Rectangle2D.Double(x, y, rodWidth, height));
+            rectangle2D.setRect(x, y, rodWidth, height);
+            g.fill(rectangle2D);
         }
     }
 }
