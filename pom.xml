@@ -6,7 +6,7 @@
 
     <groupId>fr.xen0xys</groupId>
     <artifactId>Sorting-Chanllenge</artifactId>
-    <version>1.0.0-beta</version>
+    <version>1.0.0</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -25,7 +25,55 @@
             <artifactId>guava</artifactId>
             <version>32.1.1-jre</version>
         </dependency>
-
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>fr.xen0xys.Main</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <minimizeJar>true</minimizeJar>
+                            <filters>
+                                <filter>
+                                    <excludeDefaults>false</excludeDefaults>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>**/*.md</exclude>
+                                        <exclude>**/*.markdown</exclude>
+                                        <exclude>**/*.header</exclude>
+                                        <exclude>**/*.xml</exclude>
+                                        <exclude>**/pom.properties</exclude>
+                                        <exclude>**/io.netty.versions.properties</exclude>
+                                        <exclude>**/*.args</exclude>
+                                        <exclude>**/*.so</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
