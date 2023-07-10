@@ -11,13 +11,13 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Runner extends Thread{
 
     private final Runnable action;
-    private final double aps;
+    private double aps;
     private final boolean stability;
 
     private boolean running = false;
     private boolean paused = false;
     private int passedActions = 0;
-    private final Queue<Long> apsQueue;
+    private Queue<Long> apsQueue;
     private final ReentrantLock queueLock = new ReentrantLock();
 
     /**
@@ -36,7 +36,7 @@ public class Runner extends Thread{
      */
     public Runner(@NotNull final Runnable action, @Range(from = 0, to=10000) final int aps, final boolean stability){
         this.action = action;
-        this.aps = 1D/aps;
+        this.aps = 1D / aps;
         this.stability = stability;
         this.apsQueue = EvictingQueue.create(aps);
     }
@@ -67,7 +67,12 @@ public class Runner extends Thread{
             }
             Thread.yield();
         }
-        this.apsQueue.clear();
+        this.queueLock.lock();
+        try {
+            this.apsQueue.clear();
+        } finally {
+            this.queueLock.unlock();
+        }
     }
 
     public void setPaused(boolean paused) {
@@ -75,6 +80,15 @@ public class Runner extends Thread{
     }
     public void stopRunner(){
         this.running = false;
+    }
+    public void setAps(int aps){
+        this.aps = 1D / aps;
+        this.queueLock.lock();
+        try {
+            this.apsQueue = EvictingQueue.create(aps);
+        } finally {
+            this.queueLock.unlock();
+        }
     }
 
     public boolean isRunning() {

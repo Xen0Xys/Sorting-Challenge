@@ -8,7 +8,7 @@ import java.util.List;
 public class Computer {
     private final Runner runner;
 
-    public Computer(AlgorithmType algorithmType, List<Rod> rods) {
+    public Computer(AlgorithmType algorithmType, List<Rod> rods, int tps) {
         Algorithm algorithm;
         switch (algorithmType){
             case BUBBLE_SORT -> algorithm = new BubbleSort(this, rods);
@@ -16,7 +16,7 @@ public class Computer {
             case INSERTION_SORT -> algorithm = new InsertionSort(this, rods);
             default -> throw new IllegalStateException("Unexpected value: " + algorithmType);
         }
-        this.runner = new Runner(algorithm::step, 20, true);
+        this.runner = new Runner(algorithm::step, tps, true);
     }
 
     public void start(){
