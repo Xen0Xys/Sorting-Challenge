@@ -32,13 +32,13 @@ public class Runner extends Thread{
      * Create a new Runner
      * @param action The action to run
      * @param aps The number of actions per second
-     * @param stability If the runner should be stable
+     * @param stabilized If the runner should be stable
      */
-    public Runner(@NotNull final Runnable action, @Range(from = 0, to=10000) final int aps, final boolean stability){
+    public Runner(@NotNull final Runnable action, @Range(from = 0, to=10000) final int aps, final boolean stabilized){
         this.action = action;
         this.aps = 1D / aps;
-        this.stability = stability;
-        this.apsQueue = EvictingQueue.create(aps);
+        this.stability = stabilized;
+        this.apsQueue = EvictingQueue.create(aps / 2);
     }
 
     @Override
@@ -49,12 +49,12 @@ public class Runner extends Thread{
         while (running){
             if(!paused){
                 if(System.nanoTime() >= nextAction){
-                    this.action.run();
-                    this.passedActions++;
                     if(this.stability)
                         nextAction = (long) (nextAction + this.aps * 1_000_000_000L);
                     else
                         nextAction = (long) (System.nanoTime() + this.aps * 1_000_000_000L);
+                    this.action.run();
+                    this.passedActions++;
                     long end = System.nanoTime();
                     this.queueLock.lock();
                     try {

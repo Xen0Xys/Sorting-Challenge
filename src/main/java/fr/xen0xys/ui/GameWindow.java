@@ -33,7 +33,7 @@ public class GameWindow extends JFrame implements ComponentListener {
         // Init panels and window
         this.menuPanel = new MenuPanel(this);
         this.algorithmPanel = new AlgorithmPanel(this, this.rods);
-        this.graphicRunner = new Runner(this.algorithmPanel::repaint, 60, true);
+        this.graphicRunner = new Runner(this.algorithmPanel::repaint, 60, false);
         this.initWindow();
         this.setVisible(true);
         this.generateRods(100);
